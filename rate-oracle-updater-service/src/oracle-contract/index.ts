@@ -51,7 +51,7 @@ export class RateOracleContract {
     const gas = Math.ceil(await tx.estimateGas({
       from: this.account.address,
       gasPrice
-    }))
+    }) * 1.1)
 
     return await new Promise<TransactionReceipt>((resolve, reject) => {
       this.send(

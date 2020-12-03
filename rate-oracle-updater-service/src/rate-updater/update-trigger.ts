@@ -44,7 +44,7 @@ export class RateUpdateTrigger extends EventEmitter {
 
     if (percentageChanges >= this.updateThreshold) {
       logger.info(`Trigger update oracle for threshold, changes is ${percentageChanges}% (current = ${current}, previous = ${previous})`)
-      this.emit(OracleUpdateEvent, rate)
+      this.emit(OracleUpdateEvent, current)
       this.lastUpdate = Date.now()
     }
   }

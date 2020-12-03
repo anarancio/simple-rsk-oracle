@@ -1,4 +1,3 @@
-// For full syntax see /src/types.ts::Config interface
 {
   port: 3030,
 
