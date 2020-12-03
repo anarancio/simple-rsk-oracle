@@ -6,6 +6,6 @@ module.exports = async function(deployer) {
   await deployer
       .deploy(SimpleRskOracle)
       .then(async (ins) => {
-        return await ins.addToWhitelist(PROVIDER_ACCOUNT)
+        return await ins.setOracleAddress(PROVIDER_ACCOUNT)
       })
 };

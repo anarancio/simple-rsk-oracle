@@ -36,7 +36,7 @@ contract('SimpleRskOracle', (accounts) => {
         await simpleRskOracle.transferOwnership(deployerAddress, { from: newContractOwner });
     });
 
-    it('add/remove from whitelist permissions', async () => {
+    it('add/remove oracle address', async () => {
         const simpleRskOracle = await SimpleRskOracle.deployed();
         
         const ownerAddress = accounts[0];
@@ -45,19 +45,19 @@ contract('SimpleRskOracle', (accounts) => {
 
         // we will try to add an address to the whitelist using an account which is not the owner
         await expectRevert(
-            simpleRskOracle.addToWhitelist(whitelistedAddress, { from: otherOwner }),
+            simpleRskOracle.setOracleAddress(whitelistedAddress, { from: otherOwner }),
             'Ownable: caller is not the owner',
           );
 
-        await simpleRskOracle.addToWhitelist(whitelistedAddress, { from: ownerAddress });
+        await simpleRskOracle.setOracleAddress(whitelistedAddress, { from: ownerAddress });
 
         // we will try to remove an address from the whitelist using an account which is not the owner
         await expectRevert(
-            simpleRskOracle.removeFromWhitelist(whitelistedAddress, { from: otherOwner }),
+            simpleRskOracle.clearOracleAddress({ from: otherOwner }),
             'Ownable: caller is not the owner',
           );
 
-        await simpleRskOracle.removeFromWhitelist(whitelistedAddress, { from: ownerAddress });
+        await simpleRskOracle.clearOracleAddress({ from: ownerAddress });
     });
 
     it('update price function call', async () => {
@@ -71,14 +71,14 @@ contract('SimpleRskOracle', (accounts) => {
         // we will try to call the updatePrice function without adding the address in the whitelist
         await expectRevert(
             simpleRskOracle.updatePrice(10, 10, { from: whitelistedAddress }),
-            'The address is not whitelisted',
+            'The address is not the oracle',
           );
 
-        await simpleRskOracle.addToWhitelist(whitelistedAddress, { from: ownerAddress });
+        await simpleRskOracle.setOracleAddress(whitelistedAddress, { from: ownerAddress });
         
         await simpleRskOracle.updatePrice(10, 10, { from: whitelistedAddress });
 
-        await simpleRskOracle.removeFromWhitelist(whitelistedAddress, { from: ownerAddress });
+        await simpleRskOracle.clearOracleAddress({ from: ownerAddress });
     });
 
     it('update price by Oracle', async () => {
@@ -89,7 +89,7 @@ contract('SimpleRskOracle', (accounts) => {
         const price = 19800;
         const timestamp = 1606853352;
 
-        await simpleRskOracle.addToWhitelist(whitelistedAddress, { from: ownerAddress });
+        await simpleRskOracle.setOracleAddress(whitelistedAddress, { from: ownerAddress });
         
         await simpleRskOracle.updatePrice(price, timestamp, { from: whitelistedAddress });
 
@@ -97,7 +97,7 @@ contract('SimpleRskOracle', (accounts) => {
         assert.equal(price, pricing.price.toNumber(), 'Invalid price returned');
         assert.equal(timestamp, pricing.timestamp.toNumber(), 'Invalid timestamp returned');
 
-        await simpleRskOracle.removeFromWhitelist(whitelistedAddress, { from: ownerAddress });
+        await simpleRskOracle.clearOracleAddress({ from: ownerAddress });
     });
 
 });

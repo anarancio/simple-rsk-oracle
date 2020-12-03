@@ -5,17 +5,17 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SimpleRskOracle is Ownable {
 
-    mapping(address => bool) private whitelist;
+    address private oracle;
 
     uint private _price;
     uint private _timestamp;
 
-    modifier isWhitelisted() {
-        require(whitelist[msg.sender], "The address is not whitelisted");
+    modifier isOracle() {
+        require(msg.sender == oracle, "The address is not the oracle");
         _;
     }
 
-    function updatePrice(uint price, uint timestamp) public isWhitelisted {
+    function updatePrice(uint price, uint timestamp) public isOracle {
         _price = price;
         _timestamp = timestamp;
     }
@@ -24,12 +24,12 @@ contract SimpleRskOracle is Ownable {
         return (_price, _timestamp);
     }
 
-    function addToWhitelist(address addr) public onlyOwner {
-        whitelist[addr] = true;
+    function setOracleAddress(address addr) public onlyOwner {
+        oracle = addr;
     }
 
-    function removeFromWhitelist(address addr) public onlyOwner {
-        whitelist[addr] = false;
+    function clearOracleAddress() public onlyOwner {
+        oracle = address(0);
     }
 
 }
