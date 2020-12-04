@@ -45,7 +45,7 @@ const rateUpdaterService: RateUpdaterService = {
       OracleUpdateEvent,
       async (rate: number) => {
         logger.info(`Updating Oracle with rate ${rate}`)
-        await oracleContract.updateRate(rate)
+        await oracleContract.updateRate(rate).catch(() => logger.error('Oracle updateRate transaction error'))
       }
     )
 

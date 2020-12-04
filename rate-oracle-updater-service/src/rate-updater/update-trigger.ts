@@ -56,7 +56,7 @@ export class RateUpdateTrigger extends EventEmitter {
 
     this.intervalId = setInterval(
       async () => {
-        await this.checkRate(from, to)
+        await this.checkRate(from, to).catch(e => logger.error('Check rate error, ', e.message))
       },
       this.ratePollInterval
     )
