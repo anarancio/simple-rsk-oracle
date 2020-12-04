@@ -48,10 +48,11 @@ export class RateOracleContract {
       })
     logger.debug(`Send updateRate TX with rate ${new BigNumber(rate).times(WEI).toString(10)}, original rate = ${rate}`)
     const tx = this.contract.methods.updatePrice(new BigNumber(rate).times(WEI), Date.now())
-    const gas = Math.ceil(await tx.estimateGas({
-      from: this.account.address,
-      gasPrice
-    }) * 1.1)
+    // const gas = Math.ceil(await tx.estimateGas({
+    //   from: this.account.address,
+    //   gasPrice
+    // }) * 1.1)
+    const gas = 69240000
 
     return await new Promise<TransactionReceipt>((resolve, reject) => {
       this.send(
