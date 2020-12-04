@@ -21,7 +21,7 @@ export class CryptoCompareProvider implements RateProvider {
     try {
       const response = await fetch(`${this.url}?fsyms=${from}&tsyms=${to}&api_key=${this.token}`, { method: 'GET' })
       const json = await response.json()
-
+      logger.debug('Receive response', json)
       logger.debug(`Rate received ${from}/${to} = ${json[from][to]}`)
       return json[from][to]
     } catch (e) {
