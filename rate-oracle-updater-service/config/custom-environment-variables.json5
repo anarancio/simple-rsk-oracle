@@ -6,7 +6,9 @@
 
   oracle: {
     contractAddress: 'ROS_ORACLE_CONTRACT_ADDRESS',
-    account: 'ROS_ORACLE_PROVIDER_ACCOUNT'
+    account: 'ROS_ORACLE_PROVIDER_ACCOUNT',
+    gas: 'ROS_ORACLE_GAS_LIMIT',
+    gasPrice: 'ROS_ORACLE_GAS_PRICE'
   },
 
   blockchain: {

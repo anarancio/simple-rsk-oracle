@@ -41,18 +41,20 @@ export class RateOracleContract {
   }
 
   async updateRate (rate: number): Promise<TransactionReceipt> {
-    const gasPrice = await this.eth.getGasPrice()
+    const gasPriceFromNode = await this.eth.getGasPrice()
       .catch((error: Error) => {
         logger.error('Error getting gas price, error:', error)
         throw error
       })
     logger.debug(`Send updateRate TX with rate ${new BigNumber(rate).times(WEI).toString(10)}, original rate = ${rate}`)
     const tx = this.contract.methods.updatePrice(new BigNumber(rate).times(WEI), Date.now())
-    // const gas = Math.ceil(await tx.estimateGas({
-    //   from: this.account.address,
-    //   gasPrice
-    // }) * 1.1)
-    const gas = 69240000
+    const gasPrice = config.has('oracle.gasPrice') ? config.get<number | string>('oracle.gasPrice') : gasPriceFromNode
+
+    const gasFromNode = Math.ceil(await tx.estimateGas({
+      from: this.account.address,
+      gasPrice
+    }) * 1.1)
+    const gas = config.has('oracle.gas') ? config.get<number | string>('oracle.gas') : gasFromNode
 
     return await new Promise<TransactionReceipt>((resolve, reject) => {
       this.send(
