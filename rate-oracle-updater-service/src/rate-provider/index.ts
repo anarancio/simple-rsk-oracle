@@ -10,37 +10,17 @@ export type RateEntity = { current: number, previous: number }
 
 export class RateProviderManager {
   private provider?: RateProvider
-  private rates: Record<string, RateEntity> = {}
-
-  public getLastRate (from: string, to: string): RateEntity {
-    return this.rates[`${from}/${to}`]
-  }
-
-  private updateRate (from: string, to: string, rate: number): void {
-    const currentRate = this.getLastRate(from, to)
-    logger.debug(`Store rate for ${from}/${to}, previous = ${currentRate ? currentRate.current : rate}, current = ${rate}`)
-    this.rates = {
-      ...this.rates,
-      [`${from}/${to}`]: {
-        ...currentRate
-          ? { current: rate, previous: currentRate.current }
-          : { current: rate, previous: rate }
-      }
-    }
-  }
 
   public register (provider: RateProvider): void {
     this.provider = provider
   }
 
-  public async fetchRate (from: string, to = 'USD'): Promise<number> {
+  public fetchRate (from: string, to = 'USD'): Promise<number> {
     if (!this.provider) {
       throw new Error('Rate provider is not initialized!')
     }
 
-    const rate = await this.provider.fetchRate(from, to)
-    this.updateRate(from, to, rate)
-    return rate
+    return this.provider.fetchRate(from, to)
   }
 }
 

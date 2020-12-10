@@ -55,7 +55,6 @@ export class RateOracleContract {
       gasPrice
     }) * 1.1)
     const gas = config.has('oracle.gas') ? config.get<number | string>('oracle.gas') : gasFromNode
-
     return await new Promise<TransactionReceipt>((resolve, reject) => {
       this.send(
         tx,

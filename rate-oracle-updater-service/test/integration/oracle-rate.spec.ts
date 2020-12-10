@@ -14,11 +14,9 @@ describe('Oracle rates updater service', function () {
   this.timeout(60000)
   let app: TestingApp
   let fetchRateStub: sinon.SinonStub
-  let getLastRateStub: sinon.SinonStub
 
   before(() => {
     fetchRateStub = sinon.stub(RateProviderManager.prototype, 'fetchRate')
-    getLastRateStub = sinon.stub(RateProviderManager.prototype, 'getLastRate')
   })
   after(() => {
     sinon.restore()
@@ -31,7 +29,6 @@ describe('Oracle rates updater service', function () {
     // @ts-ignore
     config.rateUpdateInterval = 2000
     fetchRateStub.resolves(2)
-    getLastRateStub.returns({ current: 2, previous: 2 })
 
     app = new TestingApp()
     await app.initAndStart()
@@ -50,9 +47,11 @@ describe('Oracle rates updater service', function () {
     // @ts-ignore
     config.rateUpdateInterval = 99999999999
 
-    fetchRateStub.resolves(2)
-    // Increase for 50%
-    getLastRateStub.returns({ current: 3, previous: 2 })
+    fetchRateStub
+      .onFirstCall()
+      .resolves(2)
+      .onSecondCall() // Increase for 50%
+      .resolves(3)
 
     app = new TestingApp()
     await app.initAndStart()
@@ -68,13 +67,13 @@ describe('Oracle rates updater service', function () {
     // @ts-ignore
     config.rateUpdateInterval = 99999999999
 
-    fetchRateStub.resolves(10)
-    // Increase for 10% should not update as we have threshold for 50%
-    getLastRateStub.returns({ current: 11, previous: 10 })
+    fetchRateStub
+      .onFirstCall().resolves(10)
+      .onSecondCall().resolves(11) // Increase for 10% should not update as we have threshold for 50%
 
     app = new TestingApp()
     await app.initAndStart()
-    await sleep(1000)
+    await sleep(3000)
 
     expect((await app.getRate()).toString(10)).to.be.eql('10')
 

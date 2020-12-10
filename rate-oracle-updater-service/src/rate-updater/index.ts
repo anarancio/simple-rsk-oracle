@@ -6,7 +6,7 @@ import { loggingFactory } from '../logger'
 import { RateOracleContract } from '../oracle-contract'
 import { RateProviderManager } from '../rate-provider'
 import { waitForReadyApp } from '../utils'
-import { OracleUpdateEvent, RateUpdateTrigger } from './update-trigger'
+import { RateUpdateTrigger } from './update-trigger'
 
 const logger = loggingFactory('rate-updater')
 
@@ -34,19 +34,17 @@ const rateUpdaterService: RateUpdaterService = {
 
     const oracleContract = new RateOracleContract(eth, config.get<string>('oracle.account'))
 
+    const updateRate = async (rate: number): Promise<void> => {
+      logger.info(`Updating Oracle with rate ${rate}`)
+      await oracleContract.updateRate(rate).catch(() => logger.error('Oracle updateRate transaction error'))
+    }
+
     const rateUpdateTrigger = new RateUpdateTrigger(
       rateProviderManager,
       config.get<number>('rateUpdateThreshold'),
       config.get<number>('rateApi.ratePollInterval'),
-      config.get<number>('rateUpdateInterval')
-    )
-
-    rateUpdateTrigger.on(
-      OracleUpdateEvent,
-      async (rate: number) => {
-        logger.info(`Updating Oracle with rate ${rate}`)
-        await oracleContract.updateRate(rate).catch(() => logger.error('Oracle updateRate transaction error'))
-      }
+      config.get<number>('rateUpdateInterval'),
+      updateRate
     )
 
     // Run polling job for BTC/USD
