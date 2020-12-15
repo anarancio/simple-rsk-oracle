@@ -22,6 +22,9 @@ describe('Oracle rates updater service', function () {
     sinon.restore()
     sinon.resetBehavior()
   })
+  beforeEach(() => {
+    fetchRateStub.reset()
+  })
 
   it('Should update rate based on update interval', async () => {
     // @ts-ignore
@@ -52,10 +55,12 @@ describe('Oracle rates updater service', function () {
       .resolves(2)
       .onSecondCall() // Increase for 50%
       .resolves(3)
+      .onThirdCall()
+      .resolves(3)
 
     app = new TestingApp()
     await app.initAndStart()
-    await sleep(1000)
+    await sleep(2000)
 
     expect((await app.getRate()).toString(10)).to.be.eql('3')
 
@@ -70,10 +75,11 @@ describe('Oracle rates updater service', function () {
     fetchRateStub
       .onFirstCall().resolves(10)
       .onSecondCall().resolves(11) // Increase for 10% should not update as we have threshold for 50%
+      .onThirdCall().resolves(11) // Increase for 10% should not update as we have threshold for 50%
 
     app = new TestingApp()
     await app.initAndStart()
-    await sleep(3000)
+    await sleep(2000)
 
     expect((await app.getRate()).toString(10)).to.be.eql('10')
 

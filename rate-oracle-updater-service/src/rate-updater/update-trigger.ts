@@ -52,9 +52,12 @@ export class RateUpdateTrigger {
     }
   }
 
-  async run (from: string, to: string): Promise<void> {
-    const rate = await this.rateProviderManager.fetchRate(from, to)
-    await this.updateRate(rate)
+  async run (from: string, to: string, oracleRate?: { price: number, timestamp: number }): Promise<void> {
+    if (oracleRate) {
+      this.lastUpdate = oracleRate.timestamp
+      this.rateInContract = oracleRate.price
+      await this.checkRate(from, to).catch(e => logger.error('Check rate error, ', e.message))
+    }
 
     this.intervalId = setInterval(
       async () => {
