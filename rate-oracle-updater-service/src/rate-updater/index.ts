@@ -33,6 +33,8 @@ const rateUpdaterService: RateUpdaterService = {
     }
 
     const oracleContract = new RateOracleContract(eth, config.get<string>('oracle.account'))
+    const oracleRate = await oracleContract.getPricing()
+    logger.info(`Oracle data: rate = ${oracleRate.price}, updateAt = ${new Date(oracleRate.timestamp)}`)
 
     const updateRate = async (rate: number): Promise<void> => {
       logger.info(`Updating Oracle with rate ${rate}`)
@@ -48,7 +50,7 @@ const rateUpdaterService: RateUpdaterService = {
     )
 
     // Run polling job for BTC/USD
-    await rateUpdateTrigger.run('BTC', 'USD')
+    await rateUpdateTrigger.run('BTC', 'USD', oracleRate)
 
     return {
       // eslint-disable-next-line require-await

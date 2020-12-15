@@ -74,8 +74,12 @@ export class RateOracleContract {
     })
   }
 
-  getPricing (): Promise<any> {
+  async getPricing (): Promise<{ price: number, timestamp: number }> {
     const tx = this.contract.methods.getPricing()
-    return tx.call()
+    const { price, timestamp } = await tx.call()
+    return {
+      price: new BigNumber(price).div(WEI).toNumber(),
+      timestamp: parseInt(timestamp)
+    }
   }
 }
